@@ -7,11 +7,15 @@ import { createTodo } from './graphql/mutations';
 import { listTodos } from './graphql/queries';
 
 import awsExports from "./aws-exports";
+
+import { withAuthenticator, Button, Heading, Text, TextField, View } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
+
 Amplify.configure(awsExports);
 
 const initialState = { name: '', description: ''}
 
-const App = () => {
+const App = ({signOut, user}) => {
   const [formState, setFormState] = useState(initialState)
   const [todos, setTodos] = useState([])
 
@@ -46,30 +50,32 @@ const App = () => {
   }
 
   return (
-    <div style={styles.container}>
-      <h2>Amplify Todos</h2>
-      <input
+    <View style={styles.container}>
+      <Heading level={1}>Hello {user.username}</Heading>
+      <Button onClick={signOut}>Sign out</Button>
+      <Heading level={2}>Amplify Todos</Heading>
+      <TextField
         onChange={event=>setInput('name', event.target.value)}
         style={styles.input}
-        value={formState.name}
+        defaultValue={formState.name}
         placeholder="Name"
         />
-      <input
+      <TextField
         onChange={event=>setInput('description', event.target.value)}
         style={styles.input}
-        value={formState.description}
+        defaultValue={formState.description}
         placeholder='Description'
       />
-      <button style={styles.button} onClick={addTodo}>Create Todo</button>
+      <Button style={styles.button} onClick={addTodo}>Create Todo</Button>
       {
         todos.map((todo, index) => (
-          <div key={todo.id ? todo.id : index} style={styles.todo}>
+          <View key={todo.id ? todo.id : index} style={styles.todo}>
             <p style={styles.todoName}>{todo.name}</p>
             <p style={styles.todoDescription}>{todo.description}</p>
-          </div>
+          </View>
         ))
       }
-    </div>
+    </View>
   )
 }
 
@@ -82,7 +88,7 @@ const styles = {
     button: { backgroundColor: 'black', color: 'white', outline: 'none', fontSize: 18, padding: '12px 0px' }
 }
 
-export default App
+export default withAuthenticator(App);
 
 /*
 function App() {
